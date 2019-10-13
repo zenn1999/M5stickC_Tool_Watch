@@ -9,9 +9,9 @@
 DHT12 dht12; //Preset scale CELSIUS and ID 0x5c.
 Adafruit_BMP280 bme;
 
-const char* ssid = "Yourssid";
-const char* password = "YourPassword";
-const char* ntpServer = "AddTimeServer";
+const char* ssid = "DawnsRouter";
+const char* password = "KrazyLittl3$quirel";
+const char* ntpServer = "time.coliinc.com";
 
 RTC_TimeTypeDef RTC_TimeStruct;
 RTC_DateTypeDef RTC_DateStruct;
@@ -27,6 +27,7 @@ void setup() {
   Wire.begin(0,26);  //Wire.begin(sda, scl);
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_37, 0); // using home button for wakeup, second parameter is the state of the button that will trigger the wakeup (0 or 1)
   M5.Lcd.setRotation(3);
+  M5.Axp.ScreenBreath(8);  //screen brightness 7-15
   M5.Lcd.fillScreen(BLACK);
   setTime();
 }
@@ -50,7 +51,7 @@ void loop() {
         
 
         } else if(modeButton == LOW && sleepButton == HIGH) {
-          M5.Lcd.fillScreen(BLACK);
+          M5.Lcd.fillScreen(BLACK);    //Added visual indicator to add time between the button press and state change.
           M5.Lcd.setCursor(2, 25);
           M5.Lcd.setTextSize(1);
           M5.Lcd.printf("Changing Modes");
@@ -84,7 +85,7 @@ void loop() {
           delay(1000);
           
         } else if(modeButton == LOW && sleepButton == HIGH) {
-          M5.Lcd.fillScreen(BLACK);
+          M5.Lcd.fillScreen(BLACK);   //Added visual indicator to add time between the button press and state change.
           M5.Lcd.setCursor(2, 25);
           M5.Lcd.setTextSize(1);
           M5.Lcd.printf("Changing Modes");
@@ -150,7 +151,7 @@ void setTime() {
     Serial.println(" CONNECTED, SETTING TIME");
     
         // Set NTP time to local
-    configTime(-5 * 3600, 3600, ntpServer);  // -5 is for my timezone
+    configTime(-5 * 3600, 3600, ntpServer);  // -5 is for my timezone. (utc - 5)
   
     // Get local time
     struct tm timeInfo;
