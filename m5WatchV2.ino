@@ -9,9 +9,9 @@
 DHT12 dht12; //Preset scale CELSIUS and ID 0x5c.
 Adafruit_BMP280 bme;
 
-const char* ssid = "DawnsRouter";
-const char* password = "KrazyLittl3$quirel";
-const char* ntpServer = "time.coliinc.com";
+const char* ssid = "YourSSID";
+const char* password = "YourPassword";
+const char* ntpServer = "AddTimeServer";
 
 RTC_TimeTypeDef RTC_TimeStruct;
 RTC_DateTypeDef RTC_DateStruct;
