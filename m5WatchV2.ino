@@ -9,9 +9,9 @@
 DHT12 dht12; //Preset scale CELSIUS and ID 0x5c.
 Adafruit_BMP280 bme;
 
-const char* ssid = "YourSSID";
-const char* password = "YourPassword";
-const char* ntpServer = "AddTimeServer";
+const char* ssid = "DawnsRouter";
+const char* password = "KrazyLittl3$quirel";
+const char* ntpServer = "time.coliinc.com";
 
 RTC_TimeTypeDef RTC_TimeStruct;
 RTC_DateTypeDef RTC_DateStruct;
@@ -20,11 +20,11 @@ int battery = 0;
 float b = 0;
 int state = 1;
 
+
 void setup() {
   // put your setup code here, to run once:
 
-  M5.begin();
-  Wire.begin(0,26);  //Wire.begin(sda, scl);
+  M5.begin(true,true,true);
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_37, 0); // using home button for wakeup, second parameter is the state of the button that will trigger the wakeup (0 or 1)
   M5.Lcd.setRotation(3);
   M5.Axp.ScreenBreath(8);  //screen brightness 7-15
@@ -36,7 +36,7 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   int modeButton = digitalRead(M5_BUTTON_HOME);
-  int sleepButton = digitalRead(M5_BUTTON_RST);  //prefered using a button for sleep instead of a timeframe
+  int sleepButton = digitalRead(M5_BUTTON_RST);  //prefered using a button for sleep instead of a timer
   
   switch(state) {
     case 1:
@@ -47,7 +47,7 @@ void loop() {
 
             batteryPercent();
 
-            delay(500);
+            delay(1000);
         
 
         } else if(modeButton == LOW && sleepButton == HIGH) {
@@ -55,7 +55,12 @@ void loop() {
           M5.Lcd.setCursor(2, 25);
           M5.Lcd.setTextSize(1);
           M5.Lcd.printf("Changing Modes");
+          Serial.begin(115200);
+          // Serial2.begin(unsigned long baud, uint32_t config, int8_t rxPin, int8_t txPin, bool invert)
+          Serial2.begin(115200, SERIAL_8N1, 26, 0);
           delay(1000);
+          M5.Lcd.fillScreen(BLACK);
+          M5.Lcd.setCursor(2, 2);
           state = 2;
         } else if(modeButton == HIGH && sleepButton == LOW) {
           M5.Lcd.fillScreen(BLACK);
@@ -63,7 +68,7 @@ void loop() {
         }
       break;
 
-      case 2:
+      case 3:
         if(modeButton == HIGH && sleepButton == HIGH) {
   
           if (!bme.begin(0x76)){  
@@ -96,8 +101,43 @@ void loop() {
           M5.Axp.DeepSleep();
         }
       break;
-  }
 
+      case 2:
+
+        // This is a serial passthrough Mode for the RS485 Hat
+        if(modeButton == HIGH && sleepButton == HIGH) {
+
+          M5.Lcd.print(".");  // a visual indicator that things are still moving along........
+
+          if(Serial.available())  // If stuff was typed in the serial monitor
+          {
+              // Send any characters the Serial monitor prints to the rs485 device
+              Serial2.print((char)Serial.read());
+          }
+          
+          if(Serial2.available()) {    // If data was sent from the rs485 device show it
+              char ch = Serial2.read();
+              M5.Lcd.setCursor(2, 2);
+              M5.Lcd.fillScreen(BLACK);
+              M5.Lcd.print(ch);
+          }
+            delay(500);
+            
+
+            }else if(modeButton == LOW && sleepButton == HIGH) {
+              M5.Lcd.fillScreen(BLACK);   //Added visual indicator to add time between the button press and state change.
+              M5.Lcd.setCursor(2, 25);
+              M5.Lcd.setTextSize(1);
+              M5.Lcd.printf("Changing Modes");
+              Wire.begin(0,26);  //Wire.begin(sda, scl);
+              delay(1000);
+              state = 3;
+            }else if(modeButton == HIGH && sleepButton == LOW) {
+              M5.Lcd.fillScreen(BLACK);
+              M5.Axp.DeepSleep();
+            }
+      break;
+   }
 }
 
 void batteryPercent() {
@@ -144,9 +184,9 @@ void loadDisplay() {
 void setTime() {
 
     // connect to wifi
-  Serial.printf("Connecting to %s ", ssid);
+  Serial.printf("Attempting to connect to %s ", ssid);
   WiFi.begin(ssid, password);
-  delay(500);
+  delay(1000);
   while (WiFi.status() == WL_CONNECTED) {  //if wifi does connect go ahead and set the time with NTP
     Serial.println(" CONNECTED, SETTING TIME");
     
@@ -173,6 +213,7 @@ void setTime() {
     }
       // Disconnect Wifi if it did connect
   WiFi.disconnect(true);
-  WiFi.mode(WIFI_OFF);  
+  WiFi.mode(WIFI_OFF);
+  Serial.println("Wifi disconnected");  
   }
 }
