@@ -9,9 +9,9 @@
 DHT12 dht12; //Preset scale CELSIUS and ID 0x5c.
 Adafruit_BMP280 bme;
 
-const char* ssid = "DawnsRouter";
-const char* password = "KrazyLittl3$quirel";
-const char* ntpServer = "time.coliinc.com";
+const char* ssid = "Your SSID";        //Add your own wifi connection info and time server.
+const char* password = "Your Password";
+const char* ntpServer = "ADD TIME SERVER";
 
 RTC_TimeTypeDef RTC_TimeStruct;
 RTC_DateTypeDef RTC_DateStruct;
@@ -57,7 +57,7 @@ void loop() {
           M5.Lcd.printf("Changing Modes");
           Serial.begin(115200);
           // Serial2.begin(unsigned long baud, uint32_t config, int8_t rxPin, int8_t txPin, bool invert)
-          Serial2.begin(115200, SERIAL_8N1, 26, 0);
+          Serial2.begin(115200, SERIAL_8N1, 26, 0); //Sets the pin configuration for mode 2 serial pass through
           delay(1000);
           M5.Lcd.fillScreen(BLACK);
           M5.Lcd.setCursor(2, 2);
@@ -129,7 +129,7 @@ void loop() {
               M5.Lcd.setCursor(2, 25);
               M5.Lcd.setTextSize(1);
               M5.Lcd.printf("Changing Modes");
-              Wire.begin(0,26);  //Wire.begin(sda, scl);
+              Wire.begin(0,26);  //Wire.begin(sda, scl); Sets the pin configuration for mode 3 and the ENV hat
               delay(1000);
               state = 3;
             }else if(modeButton == HIGH && sleepButton == LOW) {
