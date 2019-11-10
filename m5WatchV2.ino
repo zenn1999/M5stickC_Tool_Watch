@@ -25,7 +25,6 @@ void setup() {
   // put your setup code here, to run once:
 
   M5.begin(true,true,true);
-  esp_sleep_enable_ext0_wakeup(GPIO_NUM_37, 0); // using home button for wakeup, second parameter is the state of the button that will trigger the wakeup (0 or 1)
   M5.Lcd.setRotation(3);
   M5.Axp.ScreenBreath(8);  //screen brightness 7-15
   M5.Lcd.fillScreen(BLACK);
@@ -64,7 +63,7 @@ void loop() {
           state = 2;
         } else if(modeButton == HIGH && sleepButton == LOW) {
           M5.Lcd.fillScreen(BLACK);
-          M5.Axp.DeepSleep();
+          M5.Axp.SetSleep();
         }
       break;
 
@@ -98,7 +97,7 @@ void loop() {
           state = 1;
         } else if(modeButton == HIGH && sleepButton == LOW) {
           M5.Lcd.fillScreen(BLACK);
-          M5.Axp.DeepSleep();
+          M5.Axp.SetSleep();
         }
       break;
 
@@ -134,7 +133,7 @@ void loop() {
               state = 3;
             }else if(modeButton == HIGH && sleepButton == LOW) {
               M5.Lcd.fillScreen(BLACK);
-              M5.Axp.DeepSleep();
+              M5.Axp.SetSleep();
             }
       break;
    }
